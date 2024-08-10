@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   CButton,
   CCard,
@@ -16,6 +17,14 @@ import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 
 const Register = () => {
+  const navigate = useNavigate()
+  const validateEmail = (email) => {
+    return email.match(
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    )
+  }
+  const [response, setResponse] = useState(null)
+  const [error, setError] = useState(null)
   const [showAlert, setShowAlert] = useState(false)
   const [alertMessage, setAlertMessage] = useState('')
   const [alertType, setAlertType] = useState('')
@@ -28,17 +37,40 @@ const Register = () => {
       displayAlertMessage('warning', 'Enter Username', true)
     } else if (email.current.value === '') {
       displayAlertMessage('warning', 'Enter Email', true)
+    } else if (!validateEmail(email.current.value)) {
+      displayAlertMessage('warning', 'Email not valid', true)
     } else if (password.current.value === '') {
       displayAlertMessage('warning', 'Enter Password', true)
     } else if (cnfPassword.current.value === '') {
-      displayAlertMessage('warning', 'Enter Confirm password', true)
+      displayAlertMessage('warning', 'Enter Repeat Password', true)
+    } else if (password.current.value !== cnfPassword.current.value) {
+      displayAlertMessage('warning', 'Password and Repeat Password not match', true)
     } else {
       displayAlertMessage('', '', false)
-      let bobyContent = new Object()
-      bobyContent.username = username.current.value
-      bobyContent.email = email.current.value
-      bobyContent.password = password.current.value
-      console.log(bobyContent)
+      try {
+        const res = await fetch('https://localhost:7123/api/user/registeruser', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: username.current.value,
+            email: email.current.value,
+            password: password.current.value,
+          }), // Replace with your data
+        })
+
+        if (!res.ok) {
+          throw new Error('Network response was not ok')
+        } else {
+          navigate('/login')
+        }
+
+        const data = await res.json()
+        setResponse(data)
+      } catch (error) {
+        setError(error)
+      }
     }
   }
 
