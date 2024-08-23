@@ -23,6 +23,10 @@ const Register = () => {
       /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
     )
   }
+
+  const validatePassword = (password) => {
+    return password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/)
+  }
   const [response, setResponse] = useState(null)
   const [error, setError] = useState(null)
   const [showAlert, setShowAlert] = useState(false)
@@ -43,8 +47,6 @@ const Register = () => {
       displayAlertMessage('warning', 'Enter Password', true)
     } else if (cnfPassword.current.value === '') {
       displayAlertMessage('warning', 'Enter Repeat Password', true)
-    } else if (password.current.value !== cnfPassword.current.value) {
-      displayAlertMessage('warning', 'Password and Repeat Password not match', true)
     } else {
       displayAlertMessage('', '', false)
       try {
@@ -71,6 +73,56 @@ const Register = () => {
       } catch (error) {
         setError(error)
       }
+    }
+  }
+
+  const handleChange = (event) => {
+    const { name, value } = event.target
+    if (password.current.value === '') {
+      displayAlertMessage('warning', 'Enter Password', true)
+      return
+    } else {
+      displayAlertMessage('', '', false)
+    }
+
+    if (name === 'password' && !validatePassword(value)) {
+      displayAlertMessage(
+        'warning',
+        'Password should be minimum eight and maximum 15 characters, at least one uppercase letter, one lowercase letter, one number and one special character',
+        true,
+      )
+      return
+    } else {
+      displayAlertMessage('', '', false)
+    }
+
+    if (cnfPassword.current.value === '') {
+      displayAlertMessage('warning', 'Enter Repeat Password', true)
+      return
+    } else {
+      displayAlertMessage('', '', false)
+    }
+
+    if (name === 'cnfPassword' && !validatePassword(value)) {
+      displayAlertMessage(
+        'warning',
+        'Repeat Password should be minimum eight and maximum 15 characters, at least one uppercase letter, one lowercase letter, one number and one special character',
+        true,
+      )
+      return
+    } else {
+      displayAlertMessage('', '', false)
+    }
+
+    if (
+      password.current.value !== '' &&
+      cnfPassword.current.value != '' &&
+      password.current.value !== cnfPassword.current.value
+    ) {
+      displayAlertMessage('warning', 'Password and Repeat Password not match', true)
+      return
+    } else {
+      displayAlertMessage('', '', false)
     }
   }
 
@@ -106,10 +158,12 @@ const Register = () => {
                       <CIcon icon={cilLockLocked} />
                     </CInputGroupText>
                     <CFormInput
+                      name="password"
                       type="password"
                       placeholder="Password"
                       autoComplete="new-password"
                       ref={password}
+                      onChange={handleChange}
                     />
                   </CInputGroup>
                   <CInputGroup className="mb-4">
@@ -117,10 +171,12 @@ const Register = () => {
                       <CIcon icon={cilLockLocked} />
                     </CInputGroupText>
                     <CFormInput
+                      name="cnfPassword"
                       type="password"
                       placeholder="Repeat password"
                       autoComplete="new-password"
                       ref={cnfPassword}
+                      onChange={handleChange}
                     />
                   </CInputGroup>
                   <div className="d-grid">
