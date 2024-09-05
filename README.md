@@ -14,13 +14,5 @@ This project is a complete implementation of a **Login and Registration** system
 - **Backend**: ASP.NET Core
 - **Database**: SQL Server
 
-## Setup Instructions
-### Prerequisites
-- **Node.js** (for running the React frontend)
-- **.NET SDK** (for the ASP.NET Core backend)
-- **SQL Server** (for the database)
 
-### Running the Application
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/your-repository-name.git
+
